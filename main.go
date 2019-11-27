@@ -25,7 +25,7 @@ func main() {
 	CLIENT = createClient()
 
 	if INIT_REDIS_FREE := UTILS.GetEnv("INIT_REDIS_FREE", "true"); INIT_REDIS_FREE == "true" {
-		log.Print("INIT_REDIS_FREE is true or undefined, start initRedis")
+		log.Println("INIT_REDIS_FREE is true or undefined, start initRedis")
 		initRedisFree()
 	}
 
@@ -111,7 +111,7 @@ func createClient() *redis.Client {
 
 	pong, err := client.Ping().Result()
 	if err != nil {
-		panic(err)
+		log.Fatalf("Fail to connect to redis")
 	}
 	fmt.Println(pong, err)
 	// Output: PONG <nil>
