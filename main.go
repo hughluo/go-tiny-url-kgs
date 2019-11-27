@@ -26,13 +26,15 @@ func main() {
 	CLIENT = createClient()
 
 	if INIT_REDIS_FREE := UTILS.GetEnv("INIT_REDIS_FREE", "true"); INIT_REDIS_FREE == "true" {
-		log.Println("INIT_REDIS_FREE is true or undefined, start initRedis")
+		fmt.Println("INIT_REDIS_FREE is true or undefined, start initRedis")
 		initRedisFree()
+		fmt.Printf("REDIS_FREE inited, free tinyURL amount: %d\n", getSetFreeAmount())
 	}
 
 	// Set up gRPC
 	lis, err := net.Listen("tcp", ":50052")
 	if err != nil {
+		fmt.Printf("Failed to listen:  %v", err)
 		log.Fatalf("Failed to listen:  %v", err)
 	}
 
@@ -40,6 +42,7 @@ func main() {
 	pb.RegisterKGSServiceServer(s, &gRPCServer{})
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
+		fmt.Printf("Failed to serve:  %v", err)
 		log.Fatalf("Failed to serve: %v", err)
 	}
 }
@@ -47,6 +50,7 @@ func main() {
 func (s *gRPCServer) GetFreeGoTinyURL(cxt context.Context, req *pb.KGSRequest) (*pb.KGSResponse, error) {
 	result := &pb.KGSResponse{}
 	result.Result = popSetFree()
+	fmt.Printf("KGS req: %s result: %s\n", req, result.Result)
 	logMessage := fmt.Sprintf("KGS req: %s result: %s", req, result.Result)
 	log.Println(logMessage)
 	return result, nil
@@ -56,7 +60,7 @@ func initRedisFree() {
 	KEY_LENGTH, err := strconv.Atoi(UTILS.GetEnv("KEY_LENGTH", "4"))
 	if err != nil {
 		KEY_LENGTH = 4
-		log.Println("KEY_LENGTH not valid, fallback to 4")
+		fmt.Println("KEY_LENGTH not valid, fallback to 4")
 	}
 	base62 := u.GetBase62String()
 	base62Slice := strings.Split(base62, "")
@@ -112,6 +116,7 @@ func createClient() *redis.Client {
 
 	pong, err := client.Ping().Result()
 	if err != nil {
+		fmt.Println("Fail to connect to redis")
 		log.Fatalf("Fail to connect to redis")
 	}
 	fmt.Println(pong, err)
