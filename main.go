@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 
@@ -103,7 +102,7 @@ func popSetFree() string {
 }
 
 func createClient() *redis.Client {
-	REDIS_FREE_PASSWORD := os.Getenv("REDIS_FREE_PASSWORD")
+	REDIS_FREE_PASSWORD := UTILS.GetEnv("REDIS_FREE_PASSWORD", "")
 	client := redis.NewClient(&redis.Options{
 		Addr:     "redis-free-service:6379",
 		Password: REDIS_FREE_PASSWORD,
