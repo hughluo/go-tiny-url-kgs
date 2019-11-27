@@ -21,6 +21,7 @@ type gRPCServer struct{}
 var CLIENT *redis.Client
 
 func main() {
+	UTILS.ConfigureLog()
 	// Configure redis client
 	CLIENT = createClient()
 
